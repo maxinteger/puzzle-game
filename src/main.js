@@ -1,0 +1,215 @@
+var baseCanvas = document.querySelector('#canvas-1'),
+    baseCtx = baseCanvas.getContext('2d'),
+
+    canvas = document.querySelector('#canvas-2'),
+    ctx = canvas.getContext('2d'),
+
+    image = new Image();
+
+function mapImageData (imageData, fn){
+    var data = imageData.data;
+    for (var x = 0, w = imageData.width; x < w; x++){
+        for(var y = 0, h = imageData.height; y < h; y++ ){
+            var idx = (y * w + x) * 4;
+            data.set(fn(x, y, data[idx], data[idx + 1], data[idx + 2], data[idx + 3], imageData), idx);
+        }
+    }
+}
+
+function clampImage(imageData, fn){
+    mapImageData(imageData, (x, y, r, g, b, a) => [r, g, b, fn(x, y, r, g, b, a, imageData) ? a : 0])
+}
+
+function putPixel(imageData, x, y, r, g, b, a){
+    var i = (imageData.width * y + x) * 4;
+    imageData.data[i    ] = r;
+    imageData.data[i + 1] = g;
+    imageData.data[i + 2] = b;
+    imageData.data[i + 3] = a;
+}
+
+image.addEventListener('load', function () {
+    baseCanvas.width = canvas.width  = image.width;
+    baseCanvas.height= canvas.height = image.height;
+
+    baseCtx.drawImage(image, 0, 0, image.width, image.height);
+
+    var imageData = baseCtx.getImageData(0, 0, image.width, image.height);
+
+//    mapImageData(imageData, (x, y, r, g, b, a) => [r, g, b*2, a] );
+    var {sin, cos, round} = Math,
+        cx = imageData.width / 2 | 0,
+        cy = imageData.height / 2 | 0,
+        r1 = cy * cy,
+        r2 = r1 / 2,
+        a1 = cos(0),
+        a2 = cos(Math.PI / 4);
+
+    clampImage(imageData, (x, y) => {
+        x -= cx;
+        y -= cy;
+        var d = x * x + y * y,
+            a =  (x * x) / d;
+        return  d < r1 && d > r2 && a < a1 && a > a2;
+    });
+
+    ctx.putImageData(imageData, 0, 0, 0, 0, image.width, image.height);
+});
+
+
+
+image.src = '/assets/sample-small.png';
+
+var puzzleItems = [];
+
+var SelectManager = {
+    items: [],
+    canSelectMore(){
+        return this.items.length < 2;
+    },
+    addItem(item){
+        if (this.canSelectMore()){
+            this.items.push(item);
+            if (this.items.length === 2){
+                this.swap();
+            }
+        }
+    },
+    removeItem(item){
+        _.remove(this.items, item);
+    },
+    swap(){
+        var [tile1, tile2] = this.items,
+            pic1 = puzzleItems[tile1.index],
+            pic2 = puzzleItems[tile2.index];
+
+        [[pic1, tile2], [pic2, tile1]].map( (x)=> {
+            var [pic, tile] = x;
+            pic.x = tile.rect.x;
+            pic.y = tile.rect.y;
+            pic.width = tile.rect.width;
+            pic.height = tile.rect.height;
+
+            puzzleItems[tile.index] = pic;
+            tile.deselect();
+        } );
+    }
+};
+
+class PuzzleTile extends Phaser.Group {
+    constructor (game, rect, idx){
+        super(game);
+        this.index = idx;
+        this._createSprite(game, rect);
+        this._createBorderLayer(game);
+        this.rect = rect;
+        this.x = rect.x;
+        this.y = rect.y;
+        this.selected = false;
+    }
+
+    _createSprite (game, rect){
+        this.sprite = new Phaser.Sprite(game, 0, 0);
+        this.sprite.alpha = 0;
+        this.sprite.width = rect.width;
+        this.sprite.height = rect.height;
+        this.sprite.events.onInputOver.add(this.onOver, this);
+        this.sprite.events.onInputOut.add(this.onOut, this);
+        this.sprite.events.onInputDown.add(this.onDown, this);
+        this.sprite.inputEnabled = true;
+        this.add(this.sprite);
+    }
+
+    _createBorderLayer(game){
+        this.border = new Phaser.Graphics(game, 0, 0);
+
+        this.add(this.border);
+    }
+
+    _drawRect(color){
+        var {width, height} = this.rect;
+        this.border.lineStyle(2, color, 1);
+        this.border.drawRect(1, 1, width-2, height-2);
+    }
+
+    deselect(){
+        this.selected = false;
+        this.onOut();
+        SelectManager.removeItem(this);
+    }
+
+    select (){
+        if(this.selected){
+            this.deselect();
+        } else if (SelectManager.canSelectMore()){
+            this.selected = true;
+            SelectManager.addItem(this);
+            this.onOver();
+        }
+
+    }
+
+    onDown(){
+        this.select();
+    }
+
+    onOver(){
+        this._drawRect(this.selected ? 0xffff00 : 0xff0000);
+    }
+
+    onOut(){
+        if (!this.selected){
+            this.border.clear();
+        }
+    }
+}
+
+class PuzzleSprite extends Phaser.Sprite{
+    constructor(game, image, rect){
+        super(game, rect.x, rect.y, image);
+        this.crop(rect)
+    }
+}
+
+var nRand = function(min, max) {
+    var u1, u2,
+        picked = -1;
+
+        while (picked < 0 || picked > 1) {
+            u1 = Math.random();
+            u2 = Math.random();
+            picked = 1/6 * Math.pow(-2 * Math.log(u1), 0.5) * Math.cos(2 * Math.PI * u2) + 0.5;
+        }
+        return Math.floor(min + picked * (max - min));
+    },
+    random = function (a,b) { return Math.random() - 0.5;},
+    packer = new Packer(10, 10),
+    blocks = _(_.range(1000)).map((i) => { return {w: nRand(1, 5) | 0, h: nRand(1, 5) | 0}; } ).sort(random).value();
+
+packer.fit(blocks);
+
+var imageTiles = _(blocks).filter( (b) => !!b.fit ).map((b) => {
+    return new Phaser.Rectangle(b.fit.x / 10 * 512, b.fit.y / 10 * 384, b.w / 10 * 512, b.h / 10 * 384);
+}).value();
+
+var game = new Phaser.Game(640, 480, Phaser.AUTO, 'phaser', { preload, create, render }),
+    sprites = [];
+
+function preload() {
+    game.load.image('image', '/assets/sample-small.png');
+}
+
+function create() {
+    puzzleItems = imageTiles.map( (rect) => game.add.existing(new PuzzleSprite(game, 'image', rect)) );
+
+    imageTiles.map( (rect, idx) => game.add.existing(new PuzzleTile(game, rect, idx)) );
+}
+
+function render() {
+
+    // Display
+    //sprites.map(game.debug.spriteBounds.bind(game.debug));
+    //game.debug.spriteCorners(sprite, true, true);
+    //game.debug.inputInfo(32, 32);
+    //game.debug.pointer( game.input.activePointer );
+}

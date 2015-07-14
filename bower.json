@@ -1,0 +1,30 @@
+{
+  "name": "project-puzzle",
+  "version": "1.0.0",
+  "authors": [
+    "Vadasz Laszlo <maxinteger@gmail.com>"
+  ],
+  "description": "puzzle game for fun",
+  "main": "index.html",
+  "keywords": [
+    "puzzle",
+    "game",
+    "es6",
+    "practice"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "mathjs": "~1.7.1",
+    "bin-packing": "jakesgordon/bin-packing",
+    "lodash": "~3.10.0",
+    "phaser": "~2.3.0"
+  }
+}
