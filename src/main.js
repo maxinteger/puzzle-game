@@ -106,6 +106,7 @@ class PuzzleTile extends Phaser.Group {
         this.x = rect.x;
         this.y = rect.y;
         this.selected = false;
+		this.outline = false;
     }
 
     _createSprite (game, rect){
@@ -126,10 +127,10 @@ class PuzzleTile extends Phaser.Group {
         this.add(this.border);
     }
 
-    _drawRect(color){
+    _drawRect(color, w=2){
         var {width, height} = this.rect;
-        this.border.lineStyle(2, color, 1);
-        this.border.drawRect(1, 1, width-2, height-2);
+        this.border.lineStyle(w, color, 1);
+        this.border.drawRect(1, 1, width-w, height-w);
     }
 
     deselect(){
@@ -146,8 +147,12 @@ class PuzzleTile extends Phaser.Group {
             SelectManager.addItem(this);
             this.onOver();
         }
-
     }
+
+	toggleOutline(toggle){
+		this.outline = toggle === void 0 ? !this.outline : toggle;
+		this.onOut();
+	}
 
     onDown(){
         this.select();
@@ -160,6 +165,9 @@ class PuzzleTile extends Phaser.Group {
     onOut(){
         if (!this.selected){
             this.border.clear();
+			if (this.outline){
+				this._drawRect(0xffffff, 1);
+			}
         }
     }
 }
@@ -193,7 +201,7 @@ var imageTiles = _(blocks).filter( (b) => !!b.fit ).map((b) => {
 }).value();
 
 var game = new Phaser.Game(640, 480, Phaser.AUTO, 'phaser', { preload, create, render }),
-    sprites = [];
+    tiles = [];
 
 function preload() {
     game.load.image('image', '/assets/sample-small.png');
@@ -202,7 +210,8 @@ function preload() {
 function create() {
     puzzleItems = imageTiles.map( (rect) => game.add.existing(new PuzzleSprite(game, 'image', rect)) );
 
-    imageTiles.map( (rect, idx) => game.add.existing(new PuzzleTile(game, rect, idx)) );
+    tiles = imageTiles
+		.map( (rect, idx) => game.add.existing(new PuzzleTile(game, rect, idx)) );
 }
 
 function render() {
@@ -213,3 +222,7 @@ function render() {
     //game.debug.inputInfo(32, 32);
     //game.debug.pointer( game.input.activePointer );
 }
+
+document.getElementById('id-outline').addEventListener('change', function (event) {
+	tiles.map( (s) => s.toggleOutline(this.checked) );
+});
