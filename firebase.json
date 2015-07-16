@@ -1,0 +1,15 @@
+{
+  "firebase": "maxinteger-fun-puzzle",
+  "public": ".",
+  "ignore": [
+    "src/**",
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**",
+    "bower_components/phaser/docs",
+    "bower_components/phaser/src",
+    "bower_components/phaser/resources",
+    "bower_components/phaser/filters",
+    "bower_components/phaser/tasks"
+  ]
+}

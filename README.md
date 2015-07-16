@@ -14,3 +14,7 @@
 - save positions
 - implement other puzzles
 - clean code
+
+#DONE
+- outline
+- firebase host

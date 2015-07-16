@@ -22,7 +22,6 @@
     "tests"
   ],
   "dependencies": {
-    "mathjs": "~1.7.1",
     "bin-packing": "jakesgordon/bin-packing",
     "lodash": "~3.10.0",
     "phaser": "~2.3.0"
