@@ -200,7 +200,7 @@ var imageTiles = _(blocks).filter( (b) => !!b.fit ).map((b) => {
     return new Phaser.Rectangle(b.fit.x / 10 * 512, b.fit.y / 10 * 384, b.w / 10 * 512, b.h / 10 * 384);
 }).value();
 
-var game = new Phaser.Game(640, 480, Phaser.AUTO, 'phaser', { preload, create, render }),
+var game = new Phaser.Game(512, 384, Phaser.AUTO, 'phaser', { preload, create, render }),
     tiles = [];
 
 function preload() {
