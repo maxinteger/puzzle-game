@@ -28,6 +28,10 @@ function putPixel(imageData, x, y, r, g, b, a){
     imageData.data[i + 3] = a;
 }
 
+function rand(min, max){
+	return Math.floor(Math.random() * max) - min;
+}
+
 image.addEventListener('load', function () {
     baseCanvas.width = canvas.width  = image.width;
     baseCanvas.height= canvas.height = image.height;
@@ -71,15 +75,15 @@ var SelectManager = {
         if (this.canSelectMore()){
             this.items.push(item);
             if (this.items.length === 2){
-                this.swap();
+                this.swap(this.items);
             }
         }
     },
     removeItem(item){
         _.remove(this.items, item);
     },
-    swap(){
-        var [tile1, tile2] = this.items,
+    swap(tiles){
+        var [tile1, tile2] = tiles,
             pic1 = puzzleItems[tile1.index],
             pic2 = puzzleItems[tile2.index];
 
@@ -93,7 +97,14 @@ var SelectManager = {
             puzzleItems[tile.index] = pic;
             tile.deselect();
         } );
-    }
+    },
+	shuffle(tiles, iteration=10){
+
+		_.map(_.range(iteration),  () => {
+			var [i, j] = [rand(0, tiles.length), rand(0, tiles.length)];
+			this.swap([tiles[i], tiles[j]]);
+		});
+	}
 };
 
 class PuzzleTile extends Phaser.Group {
@@ -212,6 +223,8 @@ function create() {
 
     tiles = imageTiles
 		.map( (rect, idx) => game.add.existing(new PuzzleTile(game, rect, idx)) );
+
+	SelectManager.shuffle(tiles, 10);
 }
 
 function render() {
@@ -223,6 +236,6 @@ function render() {
     //game.debug.pointer( game.input.activePointer );
 }
 
-document.getElementById('id-outline').addEventListener('change', function (event) {
+document.getElementById('id-outline').addEventListener('change', function () {
 	tiles.map( (s) => s.toggleOutline(this.checked) );
 });

@@ -6,7 +6,7 @@
 [Open in browser](http://127.0.0.1/index.html)
 
 #Todo list:
-- shuffle the tiles
+- game over check
 - animated tile swap
 - use D&D image
 - difficulty levels
@@ -14,7 +14,9 @@
 - save positions
 - implement other puzzles
 - clean code
+- test?
 
 #DONE
+- shuffle the tiles
 - outline
-- firebase host
+- firebase host [Firebase link](https://maxinteger-fun-puzzle.firebaseapp.com/)
