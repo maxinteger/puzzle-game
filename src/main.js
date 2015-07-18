@@ -87,23 +87,28 @@ var SelectManager = {
             pic1 = puzzleItems[tile1.index],
             pic2 = puzzleItems[tile2.index];
 
-        [[pic1, tile2], [pic2, tile1]].map( (x)=> {
-            var [pic, tile] = x;
-            pic.x = tile.rect.x;
-            pic.y = tile.rect.y;
-            pic.width = tile.rect.width;
-            pic.height = tile.rect.height;
-
-            puzzleItems[tile.index] = pic;
-            tile.deselect();
-        } );
+        [{pic: pic1, tile: tile2}, {pic: pic2, tile: tile1}].map( this.setItem );
     },
+	setItem({pic, tile}){
+		pic.x = tile.rect.x;
+		pic.y = tile.rect.y;
+		pic.width = tile.rect.width;
+		pic.height = tile.rect.height;
+
+		puzzleItems[tile.index] = pic;
+		tile.deselect();
+	},
 	shuffle(tiles, iteration=10){
 
 		_.map(_.range(iteration),  () => {
 			var [i, j] = [rand(0, tiles.length), rand(0, tiles.length)];
 			this.swap([tiles[i], tiles[j]]);
 		});
+	},
+	solve(titles){
+		_(puzzleItems).filter( (i, idx) => i.index !== idx).map((item) => {
+			this.setItem({pic: item, tile: titles[item.index]});
+		}).value();
 	}
 };
 
@@ -184,8 +189,9 @@ class PuzzleTile extends Phaser.Group {
 }
 
 class PuzzleSprite extends Phaser.Sprite{
-    constructor(game, image, rect){
+    constructor(game, image, rect, idx){
         super(game, rect.x, rect.y, image);
+		this.index = idx;
         this.crop(rect)
     }
 }
@@ -211,15 +217,13 @@ var imageTiles = _(blocks).filter( (b) => !!b.fit ).map((b) => {
     return new Phaser.Rectangle(b.fit.x / 10 * 512, b.fit.y / 10 * 384, b.w / 10 * 512, b.h / 10 * 384);
 }).value();
 
-var game = new Phaser.Game(512, 384, Phaser.AUTO, 'phaser', { preload, create, render }),
-    tiles = [];
 
 function preload() {
     game.load.image('image', '/assets/sample-small.png');
 }
 
 function create() {
-    puzzleItems = imageTiles.map( (rect) => game.add.existing(new PuzzleSprite(game, 'image', rect)) );
+    puzzleItems = imageTiles.map( (rect, idx) => game.add.existing(new PuzzleSprite(game, 'image', rect, idx)) );
 
     tiles = imageTiles
 		.map( (rect, idx) => game.add.existing(new PuzzleTile(game, rect, idx)) );
@@ -236,6 +240,13 @@ function render() {
     //game.debug.pointer( game.input.activePointer );
 }
 
+
+var game = new Phaser.Game(512, 384, Phaser.AUTO, 'phaser', { preload, create, render }),
+	tiles = [];
+
 document.getElementById('id-outline').addEventListener('change', function () {
 	tiles.map( (s) => s.toggleOutline(this.checked) );
 });
+
+document.getElementById('id-solve-btn').addEventListener('click', (() => SelectManager.solve(tiles)) , false);
+document.getElementById('id-shuffle-btn').addEventListener('click', (() => SelectManager.shuffle(tiles)) , false);
