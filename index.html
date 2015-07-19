@@ -10,6 +10,7 @@
     <canvas id="canvas-2" style="display: none;"></canvas>
 	<div id="controls">
 		<label>
+			<h1 id="id-message"></h1>
 			<input type="checkbox" id="id-outline"/> Tile outline on/off
 			<div>
 				<button type="button" id="id-solve-btn">Solve</button>
@@ -19,6 +20,7 @@
 	</div>
 </body>
     <script src="bower_components/lodash/lodash.js"></script>
+	<script src="bower_components/eventemitter2/lib/eventemitter2.js"></script>
     <script src="bower_components/phaser/build/phaser.js"></script>
     <script src="bower_components/bin-packing/js/packer.js"></script>
     <script src="build/game.js"></script>

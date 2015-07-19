@@ -66,7 +66,7 @@ image.src = '/assets/sample-small.png';
 
 var puzzleItems = [];
 
-var SelectManager = {
+var SelectManager = _.extend(Object.create(EventEmitter2.prototype), {
     items: [],
     canSelectMore(){
         return this.items.length < 2;
@@ -88,6 +88,10 @@ var SelectManager = {
             pic2 = puzzleItems[tile2.index];
 
         [{pic: pic1, tile: tile2}, {pic: pic2, tile: tile1}].map( this.setItem );
+
+		if (this.isSolved()){
+			this.emit('solved', true);
+		}
     },
 	setItem({pic, tile}){
 		pic.x = tile.rect.x;
@@ -109,8 +113,11 @@ var SelectManager = {
 		_(puzzleItems).filter( (i, idx) => i.index !== idx).map((item) => {
 			this.setItem({pic: item, tile: titles[item.index]});
 		}).value();
+	},
+	isSolved(){
+		return puzzleItems.filter( (i, idx) => i.index !== idx).length === 0;
 	}
-};
+});
 
 class PuzzleTile extends Phaser.Group {
     constructor (game, rect, idx){
@@ -250,3 +257,7 @@ document.getElementById('id-outline').addEventListener('change', function () {
 
 document.getElementById('id-solve-btn').addEventListener('click', (() => SelectManager.solve(tiles)) , false);
 document.getElementById('id-shuffle-btn').addEventListener('click', (() => SelectManager.shuffle(tiles)) , false);
+
+SelectManager.on('solved', function () {
+	document.getElementById('id-message').innerHTML = "You solved!";
+});
