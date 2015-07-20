@@ -68,6 +68,9 @@ var puzzleItems = [];
 
 var SelectManager = _.extend(Object.create(EventEmitter2.prototype), {
     items: [],
+	init(game){
+		this.game = game;
+	},
     canSelectMore(){
         return this.items.length < 2;
     },
@@ -82,22 +85,30 @@ var SelectManager = _.extend(Object.create(EventEmitter2.prototype), {
     removeItem(item){
         _.remove(this.items, item);
     },
-    swap(tiles){
+    swap(tiles, withoutAnim){
         var [tile1, tile2] = tiles,
             pic1 = puzzleItems[tile1.index],
             pic2 = puzzleItems[tile2.index];
 
-        [{pic: pic1, tile: tile2}, {pic: pic2, tile: tile1}].map( this.setItem );
+		this.setItem({pic: pic1, tile: tile2}, withoutAnim);
+		this.setItem({pic: pic2, tile: tile1}, withoutAnim);
 
 		if (this.isSolved()){
 			this.emit('solved', true);
 		}
     },
-	setItem({pic, tile}){
-		pic.x = tile.rect.x;
-		pic.y = tile.rect.y;
-		pic.width = tile.rect.width;
-		pic.height = tile.rect.height;
+	setItem({pic, tile}, withoutAnim){
+		var {x, y, width, height} = tile.rect;
+
+		if (withoutAnim){
+			pic.x = x;
+			pic.y = y;
+			pic.width = width;
+			pic.height = height;
+		} else {
+			pic.bringToTop();
+			this.game.add.tween(pic).to( { x, y, width, height }, 500).start();
+		}
 
 		puzzleItems[tile.index] = pic;
 		tile.deselect();
@@ -106,12 +117,12 @@ var SelectManager = _.extend(Object.create(EventEmitter2.prototype), {
 
 		_.map(_.range(iteration),  () => {
 			var [i, j] = [rand(0, tiles.length), rand(0, tiles.length)];
-			this.swap([tiles[i], tiles[j]]);
+			this.swap([tiles[i], tiles[j]], true);
 		});
 	},
 	solve(titles){
 		_(puzzleItems).filter( (i, idx) => i.index !== idx).map((item) => {
-			this.setItem({pic: item, tile: titles[item.index]});
+			this.setItem({pic: item, tile: titles[item.index]}, true);
 		}).value();
 	},
 	isSolved(){
@@ -230,7 +241,10 @@ function preload() {
 }
 
 function create() {
-    puzzleItems = imageTiles.map( (rect, idx) => game.add.existing(new PuzzleSprite(game, 'image', rect, idx)) );
+	SelectManager.init(game);
+	var itemsGroup = game.add.group();
+
+    puzzleItems = imageTiles.map( (rect, idx) => itemsGroup.add(new PuzzleSprite(game, 'image', rect, idx)) );
 
     tiles = imageTiles
 		.map( (rect, idx) => game.add.existing(new PuzzleTile(game, rect, idx)) );
