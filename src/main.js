@@ -1,3 +1,8 @@
+import {Phaser} from 'phaser';
+import {EventEmitter2} from 'imports?define=>false,exports=>false,this=>window!eventemitter2/lib/eventemitter2';
+import {Packer} from '../bower_components/bin-packing/js/packer.js';
+
+
 var baseCanvas = document.querySelector('#canvas-1'),
     baseCtx = baseCanvas.getContext('2d'),
 
@@ -275,3 +280,5 @@ document.getElementById('id-shuffle-btn').addEventListener('click', (() => Selec
 SelectManager.on('solved', function () {
 	document.getElementById('id-message').innerHTML = "You solved!";
 });
+
+export {};
