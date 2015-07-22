@@ -22,13 +22,13 @@ module.exports = {
 		alias: {
 			bower: resolveBowerPath(),
 			lodash: resolveBowerPath('/lodash'),
-			phaser: resolveBowerPath('/phaser/build/custom/phaser-minimum')
+			phaser: resolveBowerPath('/phaser/build/phaser.min')
 		}
 	},
 	module: {
 		loaders: [
 			//{ test: /\.js$/,	loader: 'strict'},
-			{ test: /(phaser-minimum)\.js$/i, loader: 'script' },
+			{ test: /(phaser.min)\.js$/i, loader: 'script' },
 			{
 				test: /\.js?$/,
 				exclude: /(node_modules|bower_components)/,
@@ -36,7 +36,8 @@ module.exports = {
 			}
 		],
 		noParse: [
-			/[\/\\]bowe_components[\/\\].*$/
+			/[\/\\]bowe_components[\/\\].*$/,
+			resolveBowerPath('/phaser/build/phaser.min')
 		]
 	},
 	plugins: [

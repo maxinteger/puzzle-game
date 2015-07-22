@@ -1,6 +1,6 @@
-import {Phaser} from 'phaser';
-import {EventEmitter2} from 'imports?define=>false,exports=>false,this=>window!eventemitter2/lib/eventemitter2';
-import {Packer} from '../bower_components/bin-packing/js/packer.js';
+import {} from 'phaser';
+import {} from 'imports?define=>false,exports=>false,this=>window!eventemitter2/lib/eventemitter2';
+import {} from 'bin-packing/js/packer.js';
 
 
 var baseCanvas = document.querySelector('#canvas-1'),
