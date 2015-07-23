@@ -18,7 +18,10 @@ module.exports = {
 		filename: 'game.js'
 	},
 	resolve: {
-		root: [resolveBowerPath()],
+		root: [
+			resolveBowerPath(),
+			path.join(__dirname, 'src')
+		],
 		alias: {
 			bower: resolveBowerPath(),
 			lodash: resolveBowerPath('/lodash'),
