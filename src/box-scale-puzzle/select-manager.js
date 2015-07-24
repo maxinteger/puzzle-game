@@ -1,3 +1,4 @@
+import {} from 'imports?define=>false,exports=>false,this=>window!eventemitter2/lib/eventemitter2';
 import {rand} from '../utils';
 
 export default _.extend(Object.create(EventEmitter2.prototype), {
