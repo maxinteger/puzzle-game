@@ -4,20 +4,16 @@
     <meta charset="UTF-8">
     <title>Puzzle game</title>
 	<link rel="stylesheet" href="assets/style.css"/>
+	<script type="text/javascript">
+		WebFontConfig = {
+			google: { families: [ 'Galindo::latin,latin-ext' ] }
+		};
+	</script>
+	<script src="//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
 </head>
 <body>
     <canvas id="canvas-1" style="display: none;"></canvas>
     <canvas id="canvas-2" style="display: none;"></canvas>
-	<div id="controls">
-		<label>
-			<h1 id="id-message"></h1>
-			<input type="checkbox" id="id-outline"/> Tile outline on/off
-			<div>
-				<button type="button" id="id-solve-btn">Solve</button>
-				<button type="button" id="id-shuffle-btn">Shuffle</button>
-			</div>
-		</label>
-	</div>
 </body>
     <script src="build/game.js"></script>
 </html>

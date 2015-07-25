@@ -3,6 +3,10 @@ import {} from 'bin-packing/js/packer.js';
 import PuzzleTile from './puzzle-tile';
 import PuzzleSprite from './puzzle-sprite';
 import SelectManager from './select-manager';
+import {createLabel} from '../gui/common';
+import {Button} from '../gui/button';
+import {Link} from '../gui/link';
+import {Checkbox} from '../gui/checkbox';
 import {nRand, randomComparator} from '../utils';
 
 export class BoxScalePuzzle {
@@ -18,19 +22,44 @@ export class BoxScalePuzzle {
 	}
 
 	preload(){
+		this.load.atlasJSONHash('gui', '/assets/gui.png', '/assets/gui.json');
 		this.load.image('image', '/assets/sample-small.png');
 	}
 
 	create(){
 		var game = this.game,
-			itemsGroup = game.add.group();
+			itemsGroup = game.add.group(),
+			tileGroup = game.add.group();
 
-		this.puzzleItems = this.imageTiles.map( (rect, idx) => itemsGroup.add(new PuzzleSprite(game, 'image', rect, idx)) );
+		game.stage.backgroundColor = '#A67F59';
+
+		this.puzzleItems = this.imageTiles
+			.map( (rect, idx) => itemsGroup.add(new PuzzleSprite(game, 'image', rect, idx)) );
 
 		this.tiles = this.imageTiles
-			.map( (rect, idx) => game.add.existing(new PuzzleTile(game, rect, idx)) );
+			.map( (rect, idx) => tileGroup.add(new PuzzleTile(game, rect, idx)) );
+
+		itemsGroup.x = tileGroup.x = (game.world.width - tileGroup.width) / 2;
+		itemsGroup.y = tileGroup.y = (game.world.height - tileGroup.height) / 2;
 
 		SelectManager.init(game, this.puzzleItems);
 		SelectManager.shuffle(this.tiles, 10);
+
+		var btnShuffle = new Button(game, 20, game.world.height - 75, 'Shuffle');
+		btnShuffle.events.onInputDown.add(() => SelectManager.shuffle(this.tiles));
+		game.add.existing(btnShuffle);
+
+		var btnSolve = new Button(game, 200, game.world.height - 75, 'solve');
+		btnSolve.events.onInputDown.add(() => SelectManager.solve(this.tiles));
+		game.add.existing(btnSolve);
+
+		var showOutline = new Checkbox(game, 500, game.world.height - 70, 'Tile\'s outline');
+		showOutline.events.onChange.add((cbx)=> this.tiles.map( (s) => s.toggleOutline(cbx.checked) ) );
+        game.add.existing(showOutline);
+
+		SelectManager.events.onSolve.add(()=> {
+			var gameOver = createLabel(game, game.world.width/2, 50, 'Congratulation\nYou solved!');
+			game.add.existing(gameOver);
+		});
 	}
 }

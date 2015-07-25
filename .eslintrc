@@ -17,7 +17,6 @@
     "_": false
   },
   "rules": {
-    "strict": false,
     "quotes": [2, "single" ],
     "no-underscore-dangle": 0,
     "max-statements": [2, 15],

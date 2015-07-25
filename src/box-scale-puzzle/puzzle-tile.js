@@ -1,4 +1,3 @@
-import {} from 'phaser';
 import {default as SelectManager} from './select-manager';
 
 export default class PuzzleTile extends Phaser.Group {

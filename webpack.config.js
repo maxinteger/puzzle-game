@@ -49,7 +49,8 @@ module.exports = {
 		),
 		new webpack.ContextReplacementPlugin(/.*$/, /a^/),
 		new webpack.ProvidePlugin({
-			_: 'exports?window._!bower/lodash'
+			_: 'exports?window._!bower/lodash',
+			Phaser: 'exports?window.Phaser!bower/phaser/build/phaser.min'
 		})
 	]
 };

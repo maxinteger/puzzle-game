@@ -31,3 +31,7 @@
 - animated tile swap
 - webpack
 - firebase host [Firebase link](https://maxinteger-fun-puzzle.firebaseapp.com/)
+
+
+# Resources:
+- GUI buttons: [Free gameart2d sprites](http://www.gameart2d.com/freebies.html)

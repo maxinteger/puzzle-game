@@ -1,8 +1,10 @@
-import {} from 'imports?define=>false,exports=>false,this=>window!eventemitter2/lib/eventemitter2';
 import {rand} from '../utils';
 
-export default _.extend(Object.create(EventEmitter2.prototype), {
+export default _.extend(Object.create(null), {
 	items: [],
+	events: {
+		onSolve: new Phaser.Signal()
+	},
 	init(game, puzzleItems){
 		this.game = game;
 		this.puzzleItems = puzzleItems;
@@ -30,7 +32,7 @@ export default _.extend(Object.create(EventEmitter2.prototype), {
 		this.setItem({pic: pic2, tile: tile1}, withoutAnim);
 
 		if (this.isSolved()){
-			this.emit('solved', true);
+			this.events.onSolve.dispatch(this);
 		}
 	},
 	setItem({pic, tile}, withoutAnim){
