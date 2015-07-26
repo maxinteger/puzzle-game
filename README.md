@@ -23,6 +23,7 @@
     * circle puzzle ("rotascope")
 - clean code
 - test?
+- menu
 
 #DONE
 - game over check
@@ -30,6 +31,8 @@
 - outline
 - animated tile swap
 - webpack
+- basic GUI
+- highlight image if it is in the right position
 - firebase host [Firebase link](https://maxinteger-fun-puzzle.firebaseapp.com/)
 
 

@@ -31,6 +31,7 @@ export default _.extend(Object.create(null), {
 		this.setItem({pic: pic1, tile: tile2}, withoutAnim);
 		this.setItem({pic: pic2, tile: tile1}, withoutAnim);
 
+		this._highlightItems();
 		if (this.isSolved()){
 			this.events.onSolve.dispatch(this);
 		}
@@ -62,6 +63,15 @@ export default _.extend(Object.create(null), {
 		_(this.puzzleItems).filter( (i, idx) => i.index !== idx).map((item) => {
 			this.setItem({pic: item, tile: titles[item.index]}, true);
 		}).value();
+	},
+	highlight(state){
+		this._highlight = state;
+		this._highlightItems();
+	},
+	_highlightItems(){
+		this.puzzleItems.map( (item, idx) => {
+			item.alpha = this._highlight && item.index !== idx ? 0.5 : 1;
+		})
 	},
 	isSolved(){
 		return this.puzzleItems.filter( (i, idx) => i.index !== idx).length === 0;
