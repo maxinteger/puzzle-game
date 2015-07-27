@@ -24,7 +24,7 @@
   "dependencies": {
     "bin-packing": "jakesgordon/bin-packing",
     "lodash": "~3.10.0",
-    "phaser": "~2.3.0",
+    "phaser": "~2.4",
     "eventemitter2": "~0.4.14"
   }
 }
