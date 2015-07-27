@@ -3,10 +3,7 @@ import {} from 'bin-packing/js/packer.js';
 import PuzzleTile from './puzzle-tile';
 import PuzzleSprite from './puzzle-sprite';
 import SelectManager from './select-manager';
-import {createLabel} from '../gui/common';
-import {Button} from '../gui/button';
-import {Link} from '../gui/link';
-import {Checkbox} from '../gui/checkbox';
+import {Button, Link, Checkbox, createLabel} from '../gui';
 import {nRand, randomComparator} from '../utils';
 
 export class BoxScalePuzzle {
