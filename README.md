@@ -19,7 +19,7 @@
 - timer
 - save positions
 - implement other puzzles
-    * "tilitoli"
+    * sliding puzzle
     * circle puzzle ("rotascope")
 - clean code
 - test?

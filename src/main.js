@@ -1,4 +1,4 @@
-import {BoxScalePuzzle} from './box-scale-puzzle/main';
+import {BoxScalePuzzle} from './puzzle/box-scale-puzzle/main';
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser');
 

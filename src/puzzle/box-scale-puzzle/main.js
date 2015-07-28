@@ -1,10 +1,10 @@
 import {} from 'bin-packing/js/packer.js';
 
-import PuzzleTile from './puzzle-tile';
-import PuzzleSprite from './puzzle-sprite';
+import SelectableTile from './selectable-tile';
+import PuzzleSprite from '../common/puzzle-sprite';
 import SelectManager from './select-manager';
-import {Button, Link, Checkbox, createLabel} from '../gui';
-import {nRand, randomComparator} from '../utils';
+import {Button, Link, Checkbox, createLabel} from '../../gui';
+import {nRand, randomComparator} from '../../utils';
 
 export class BoxScalePuzzle {
 	constructor(game){
@@ -34,7 +34,7 @@ export class BoxScalePuzzle {
 			.map( (rect, idx) => itemsGroup.add(new PuzzleSprite(game, 'image', rect, idx)) );
 
 		this.tiles = this.imageTiles
-			.map( (rect, idx) => tileGroup.add(new PuzzleTile(game, rect, idx)) );
+			.map( (rect, idx) => tileGroup.add(new SelectableTile(game, rect, idx)) );
 
 		itemsGroup.x = tileGroup.x = (game.world.width - tileGroup.width) / 2;
 		itemsGroup.y = tileGroup.y = (game.world.height - tileGroup.height) / 2;

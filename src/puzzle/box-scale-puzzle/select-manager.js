@@ -1,4 +1,4 @@
-import {rand} from '../utils';
+import {rand} from '../../utils';
 
 export default _.extend(Object.create(null), {
 	items: [],

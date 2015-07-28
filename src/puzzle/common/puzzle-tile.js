@@ -1,5 +1,3 @@
-import {default as SelectManager} from './select-manager';
-
 export default class PuzzleTile extends Phaser.Group {
 	constructor (game, rect, idx){
 		super(game);
@@ -20,8 +18,8 @@ export default class PuzzleTile extends Phaser.Group {
 		this.sprite.height = rect.height;
 		this.sprite.events.onInputOver.add(this.onOver, this);
 		this.sprite.events.onInputOut.add(this.onOut, this);
-		this.sprite.events.onInputDown.add(this.onDown, this);
 		this.sprite.inputEnabled = true;
+		this.events = this.sprite.events;
 		this.add(this.sprite);
 	}
 
@@ -37,29 +35,9 @@ export default class PuzzleTile extends Phaser.Group {
 		this.border.drawRect(1, 1, width-w, height-w);
 	}
 
-	deselect(){
-		this.selected = false;
-		this.onOut();
-		SelectManager.removeItem(this);
-	}
-
-	select (){
-		if(this.selected){
-			this.deselect();
-		} else if (SelectManager.canSelectMore()){
-			this.selected = true;
-			SelectManager.addItem(this);
-			this.onOver();
-		}
-	}
-
 	toggleOutline(toggle){
 		this.outline = toggle === void 0 ? !this.outline : toggle;
 		this.onOut();
-	}
-
-	onDown(){
-		this.select();
 	}
 
 	onOver(){
