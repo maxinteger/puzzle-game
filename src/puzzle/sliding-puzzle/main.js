@@ -3,27 +3,70 @@ import {Button, Link, Checkbox, createLabel} from '../../gui';
 
 import PuzzleTile from '../common/puzzle-tile';
 import PuzzleSprite from '../common/puzzle-sprite';
+import {rand} from '../../utils'
 
-var size = 5;
+var size = 3,
+	numOfItems = size * size - 1;
 
 var SlidingManager = _.extend(Object.create(null), {
 	init(game, tiles){
-		_(this.puzzleItems).filter( (i, idx) => i.index !== idx).map((item) => {
-			this.setItem({pic: item, tile: titles[item.index]}, true);
-		}).value();
+		this.game = game;
+		this.holeIdx = numOfItems;
+		this.getNextItemIdxs(this.holeIdx);
+		this.puzzleItems = tiles;
 		this.events = {
 			onSolve: new Phaser.Signal()
 		};
 	},
-	move(){
-		pic.bringToTop();
-		this.game.add.tween(pic).to( { x, y, width, height }, 500).start();
-	},
-	shuffle(){
 
-	},
-	solve(){
+	getNextItemIdxs: _.memoize( (holeIdx) => {
+		return [holeIdx - 1, holeIdx + 1, holeIdx - size, holeIdx + size]
+			.filter( i => i >= 0 &&
+					 	  i <= numOfItems &&
+						  i % size === holeIdx % size || (i / size | 0) === (holeIdx / size | 0)
+		)
+	}),
 
+	move(tile, tiles, withoutAnim=false){
+		if (_.contains(this.getNextItemIdxs(this.holeIdx), tile.index) ){
+			var pic = _.find(this.puzzleItems, {index: tile.index}),
+				tt = tiles[this.holeIdx];
+			pic.index = this.holeIdx;
+			this.holeIdx = tile.index;
+
+			if(!withoutAnim){
+				pic.bringToTop();
+				this.game.add.tween(pic).to( { x: tt.x, y: tt.y }, 500).start();
+			} else {
+				pic.x = tt.x;
+				pic.y = tt.y;
+			}
+
+			if (this.isSolved()){
+				this.events.onSolve.dispatch(this);
+			}
+		}
+	},
+	shuffle(tiles, iteration=5){
+		_.range(iteration)
+			.map( () => {
+				var idxs = this.getNextItemIdxs(this.holeIdx);
+				this.move(tiles[idxs[rand(0, idxs.length)]], tiles, true);
+			})
+	},
+	solve(tiles){
+		_(this.puzzleItems)
+			.filter( (i, idx) => i.index !== idx)
+			.map((item) => {
+				var tile = tiles[item.index];
+				item.x = tile.x;
+				item.y = tile.y;
+				item.index = tile.index;
+			})
+			.value();
+	},
+	isSolved(){
+		return this.puzzleItems.filter( (i, idx) => i.index !== idx).length === 0;
 	}
 });
 
@@ -33,7 +76,7 @@ export class SlidingPuzzle {
 
 		this.puzzleItems = [];
 		this.tiles = [];
-		this.imageTiles = _(_.range(size * size - 1))
+		this.imageTiles = _(_.range(numOfItems + 1))
 			.map( i => new Phaser.Rectangle(rSize * (i % size), rSize * (i / size | 0), rSize, rSize) )
 			.value();
 	}
@@ -50,11 +93,15 @@ export class SlidingPuzzle {
 
 		game.stage.backgroundColor = '#A67F59';
 
-		this.puzzleItems = this.imageTiles
+		this.puzzleItems = _.initial(this.imageTiles)
 			.map( (rect, idx) => itemsGroup.add(new PuzzleSprite(game, 'image', rect, idx)) );
 
 		this.tiles = this.imageTiles
-			.map( (rect, idx) => tileGroup.add(new PuzzleTile(game, rect, idx)) );
+			.map( (rect, idx) => {
+				var tile = new PuzzleTile(game, rect, idx);
+				tile.events.onInputDown.add( ()=> SlidingManager.move(tile, this.tiles) );
+				return tileGroup.add(tile);
+			} );
 
 		itemsGroup.x = tileGroup.x = (game.world.width - tileGroup.width) / 2;
 		itemsGroup.y = tileGroup.y = (game.world.height - tileGroup.height) / 2;
