@@ -21,9 +21,9 @@ var SlidingManager = _.extend(Object.create(null), {
 
 	getNextItemIdxs: _.memoize( (holeIdx) => {
 		return [holeIdx - 1, holeIdx + 1, holeIdx - size, holeIdx + size]
-			.filter( i => i >= 0 &&
-					 	  i <= numOfItems &&
-						  i % size === holeIdx % size || (i / size | 0) === (holeIdx / size | 0)
+			.filter( (i) => { return i >= 0 &&
+								   i <= numOfItems &&
+						  		   i % size === holeIdx % size || (i / size | 0) === (holeIdx / size | 0) }
 		)
 	}),
 
@@ -109,17 +109,23 @@ export class SlidingPuzzle {
 		SlidingManager.init(game, this.puzzleItems);
 		SlidingManager.shuffle(this.tiles, 10);
 
-		var btnShuffle = new Button(game, 20, game.world.height - 75, 'Shuffle');
+
+		var btnBack = new Link(game, 25, game.world.height - 75, 'Menu', 'menu');
+		btnBack.events.onInputDown.add(() => game.state.start('Menu'));
+		btnBack.scale.setTo(.75);
+		game.add.existing(btnBack);
+
+		var btnShuffle = new Button(game, 150, game.world.height - 75, 'Shuffle');
 		btnShuffle.events.onInputDown.add(() => SlidingManager.shuffle(this.tiles));
 		btnShuffle.scale.setTo(.75);
 		game.add.existing(btnShuffle);
 
-		var btnSolve = new Button(game, 200, game.world.height - 75, 'solve');
+		var btnSolve = new Button(game, 300, game.world.height - 75, 'solve');
 		btnSolve.events.onInputDown.add(() => SlidingManager.solve(this.tiles));
 		btnSolve.scale.setTo(.75);
 		game.add.existing(btnSolve);
 
-		var showOutline = new Checkbox(game, 500, game.world.height - 70, 'Tile\'s outline');
+		var showOutline = new Checkbox(game, 450, game.world.height - 70, 'Tile\'s outline');
 		showOutline.events.onChange.add((cbx)=> this.tiles.map( (s) => s.toggleOutline(cbx.checked) ) );
 		showOutline.scale.setTo(.75);
 		game.add.existing(showOutline);

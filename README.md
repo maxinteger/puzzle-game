@@ -24,6 +24,7 @@
 - clean code
 - test?
 - menu
+- leader board with firebase
 
 #DONE
 - game over check

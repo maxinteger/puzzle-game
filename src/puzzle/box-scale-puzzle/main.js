@@ -42,25 +42,33 @@ export class BoxScalePuzzle {
 		SelectManager.init(game, this.puzzleItems);
 		SelectManager.shuffle(this.tiles, 10);
 
-		var btnShuffle = new Button(game, 20, game.world.height - 75, 'Shuffle');
+
+		var btnBack = new Link(game, 25, game.world.height - 75, 'Menu', 'menu');
+		btnBack.events.onInputDown.add(() => game.state.start('Menu'));
+		btnBack.scale.setTo(.75);
+		game.add.existing(btnBack);
+
+
+		var btnShuffle = new Button(game, 150, game.world.height - 75, 'Shuffle');
 		btnShuffle.events.onInputDown.add(() => SelectManager.shuffle(this.tiles));
 		btnShuffle.scale.setTo(.75);
 		game.add.existing(btnShuffle);
 
-		var btnSolve = new Button(game, 200, game.world.height - 75, 'solve');
+		var btnSolve = new Button(game, 300, game.world.height - 75, 'solve');
 		btnSolve.events.onInputDown.add(() => SelectManager.solve(this.tiles));
 		btnSolve.scale.setTo(.75);
 		game.add.existing(btnSolve);
 
-		var showOutline = new Checkbox(game, 500, game.world.height - 70, 'Tile\'s outline');
-		showOutline.events.onChange.add((cbx)=> this.tiles.map( (s) => s.toggleOutline(cbx.checked) ) );
-		showOutline.scale.setTo(.75);
-        game.add.existing(showOutline);
-
-		var highlight = new Checkbox(game, 350, game.world.height - 70, 'Highlight');
+		var highlight = new Checkbox(game, 450, game.world.height - 70, 'Highlight');
 		highlight.events.onChange.add((cbx)=> SelectManager.highlight(cbx.checked) );
 		highlight.scale.setTo(.75);
 		game.add.existing(highlight);
+
+
+		var showOutline = new Checkbox(game, 615, game.world.height - 70, 'Tile\'s outline');
+		showOutline.events.onChange.add((cbx)=> this.tiles.map( (s) => s.toggleOutline(cbx.checked) ) );
+		showOutline.scale.setTo(.75);
+		game.add.existing(showOutline);
 
 		SelectManager.events.onSolve.add(()=> {
 			var gameOver = createLabel(game, game.world.width/2, 50, 'Congratulation\nYou solved!');
