@@ -19,14 +19,13 @@
 - timer
 - save positions
 - implement other puzzles
-    * sliding puzzle
     * circle puzzle ("rotascope")
 - clean code
 - test?
-- menu
 - leader board with firebase
 
 #DONE
+- menu
 - game over check
 - shuffle the tiles
 - outline
@@ -35,6 +34,8 @@
 - basic GUI
 - highlight image if it is in the right position
 - firebase host [Firebase link](https://maxinteger-fun-puzzle.firebaseapp.com/)
+- implement other puzzles
+    * sliding puzzle
 
 
 # Resources:

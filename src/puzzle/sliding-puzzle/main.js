@@ -10,12 +10,14 @@ var size = 3,
 
 var SlidingManager = _.extend(Object.create(null), {
 	init(game, tiles){
+		this.moveCounter = 0;
 		this.game = game;
 		this.holeIdx = numOfItems;
 		this.getNextItemIdxs(this.holeIdx);
 		this.puzzleItems = tiles;
 		this.events = {
-			onSolve: new Phaser.Signal()
+			onSolve: new Phaser.Signal(),
+			onMove: new Phaser.Signal()
 		};
 	},
 
@@ -28,6 +30,7 @@ var SlidingManager = _.extend(Object.create(null), {
 	}),
 
 	move(tile, tiles, withoutAnim=false){
+
 		if (_.contains(this.getNextItemIdxs(this.holeIdx), tile.index) ){
 			var pic = _.find(this.puzzleItems, {index: tile.index}),
 				tt = tiles[this.holeIdx];
@@ -35,6 +38,8 @@ var SlidingManager = _.extend(Object.create(null), {
 			this.holeIdx = tile.index;
 
 			if(!withoutAnim){
+				this.moveCounter++;
+				this.events.onMove.dispatch(this);
 				pic.bringToTop();
 				this.game.add.tween(pic).to( { x: tt.x, y: tt.y }, 500).start();
 			} else {
@@ -52,7 +57,9 @@ var SlidingManager = _.extend(Object.create(null), {
 			.map( () => {
 				var idxs = this.getNextItemIdxs(this.holeIdx);
 				this.move(tiles[idxs[rand(0, idxs.length)]], tiles, true);
-			})
+			});
+		this.moveCounter = 0;
+		this.events.onMove.dispatch(this);
 	},
 	solve(tiles){
 		_(this.puzzleItems)
@@ -64,6 +71,9 @@ var SlidingManager = _.extend(Object.create(null), {
 				item.index = tile.index;
 			})
 			.value();
+
+		this.moveCounter = 0;
+		this.events.onMove.dispatch(this);
 	},
 	isSolved(){
 		return this.puzzleItems.filter( (i, idx) => i.index !== idx).length === 0;
@@ -131,9 +141,16 @@ export class SlidingPuzzle {
 		game.add.existing(showOutline);
 
 
+		var countLabel = createLabel(game, game.world.width-50, game.world.height / 2, '0');
+		game.add.existing(countLabel);
+
 		SlidingManager.events.onSolve.add(()=> {
 			var gameOver = createLabel(game, game.world.width/2, 50, 'Congratulation\nYou solved!');
 			game.add.existing(gameOver);
 		});
+
+		SlidingManager.events.onMove.add( manager =>{
+			countLabel.text = manager.moveCounter;
+		})
 	}
 }
