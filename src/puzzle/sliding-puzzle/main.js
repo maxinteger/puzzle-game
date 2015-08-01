@@ -23,10 +23,7 @@ var SlidingManager = _.extend(Object.create(null), {
 
 	getNextItemIdxs: _.memoize( (holeIdx) => {
 		return [holeIdx - 1, holeIdx + 1, holeIdx - size, holeIdx + size]
-			.filter( (i) => { return i >= 0 &&
-								   i <= numOfItems &&
-						  		   i % size === holeIdx % size || (i / size | 0) === (holeIdx / size | 0) }
-		)
+			.filter( i => (i >= 0) && (i <= numOfItems) && (i % size === holeIdx % size || (i / size | 0) === (holeIdx / size | 0)) );
 	}),
 
 	move(tile, tiles, withoutAnim=false){
