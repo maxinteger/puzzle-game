@@ -1,5 +1,5 @@
 import {Button, Link, Checkbox, createLabel} from '../../gui';
-
+import {mapImageData, clampImage} from './basic';
 
 import PuzzleTile from '../common/puzzle-tile';
 import PuzzleSprite from '../common/puzzle-sprite';
@@ -77,6 +77,29 @@ var MoveManager = _.extend(Object.create(null), {
 	}
 });
 
+
+function sliceImage(srcBitmap, targetBitmap, r1, r2, sizeRad, offsetRad=0){
+
+	var ctx = srcBitmap.context,
+		imageData = ctx.getImageData(0, 0, srcBitmap.width, srcBitmap.height),
+		cx = srcBitmap.width / 2 | 0,
+		cy = srcBitmap.height / 2 | 0,
+		a1 = Math.cos(offsetRad),
+		a2 = Math.cos(sizeRad + offsetRad),
+		R1 = r1 * r1,
+		R2 = r2 * r2;
+
+	clampImage(imageData, (x, y) => {
+		x -= cx;
+		y -= cy;
+		var d = x * x + y * y,
+			a =  (x * x) / d;
+		return  d < R1 && d > R2 && a > a2 && a <= a1;
+	});
+
+	targetBitmap.context.putImageData(imageData, 0, 0, 0, 0, srcBitmap.width, srcBitmap.height);
+}
+
 export class CirclePuzzle {
 	constructor(game){
 		var rSize = 384 / size | 0;
@@ -102,6 +125,10 @@ export class CirclePuzzle {
 		btm.load('image');
 
 		game.stage.backgroundColor = '#A67F59';
+
+		var r1 = Math.min(btm.width, btm.height) / 2 | 0;
+
+        sliceImage(btm, btm, r1, r1/2, Math.PI / 3, 0);
 
 		game.add.image(0, 0, btm);
 

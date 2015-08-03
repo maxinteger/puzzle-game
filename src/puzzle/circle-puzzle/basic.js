@@ -1,16 +1,5 @@
-/**
- * Created by vadasz on 2015.07.23..
- */
 
-var baseCanvas = document.querySelector('#canvas-1'),
-	baseCtx = baseCanvas.getContext('2d'),
-
-	canvas = document.querySelector('#canvas-2'),
-	ctx = canvas.getContext('2d'),
-
-	image = new Image();
-
-function mapImageData (imageData, fn){
+export function mapImageData (imageData, fn){
 	var data = imageData.data;
 	for (var x = 0, w = imageData.width; x < w; x++){
 		for(var y = 0, h = imageData.height; y < h; y++ ){
@@ -20,11 +9,11 @@ function mapImageData (imageData, fn){
 	}
 }
 
-function clampImage(imageData, fn){
+export function clampImage(imageData, fn){
 	mapImageData(imageData, (x, y, r, g, b, a) => [r, g, b, fn(x, y, r, g, b, a, imageData) ? a : 0])
 }
 
-function putPixel(imageData, x, y, r, g, b, a){
+export function putPixel(imageData, x, y, r, g, b, a){
 	var i = (imageData.width * y + x) * 4;
 	imageData.data[i    ] = r;
 	imageData.data[i + 1] = g;
@@ -32,10 +21,7 @@ function putPixel(imageData, x, y, r, g, b, a){
 	imageData.data[i + 3] = a;
 }
 
-function rand(min, max){
-	return Math.floor(Math.random() * max) - min;
-}
-
+/*
 image.addEventListener('load', function () {
 	baseCanvas.width = canvas.width  = image.width;
 	baseCanvas.height= canvas.height = image.height;
@@ -64,7 +50,4 @@ image.addEventListener('load', function () {
 	ctx.putImageData(imageData, 0, 0, 0, 0, image.width, image.height);
 });
 
-
-
-image.src = '/assets/sample-small.png';
-
+*/
