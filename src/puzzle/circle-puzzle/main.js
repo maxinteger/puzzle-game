@@ -79,13 +79,16 @@ var MoveManager = _.extend(Object.create(null), {
 
 
 function sliceImage(srcBitmap, targetBitmap, r1, r2, radFrom, radTo){
-
+	function getLimit(rad){
+		var q = Math.PI / 4;
+		return ((rad > q && rad < q * 3) || (rad > q * 5 && rad < q * 7 ) ? Math.sin : Math.cos)(rad);
+	}
 	var ctx = srcBitmap.context,
 		imageData = ctx.getImageData(0, 0, srcBitmap.width, srcBitmap.height),
 		cx = srcBitmap.width / 2 | 0,
 		cy = srcBitmap.height / 2 | 0,
-		a1 = Math.cos(radFrom),
-		a2 = Math.cos(radTo),
+		a2 = getLimit(radFrom),
+		a1 = getLimit(radTo),
 		R1 = r1 * r1,
 		R2 = r2 * r2;
 
@@ -93,8 +96,10 @@ function sliceImage(srcBitmap, targetBitmap, r1, r2, radFrom, radTo){
 		x -= cx;
 		y -= cy;
 		var d = x * x + y * y,
-			a = (x*x) / d * (x < 0) ? -1 : 1;
-		return  d < R1 && d > R2 && a > a1 && a <= a2;
+			dd = Math.sqrt(d),
+			a = x / dd,
+			b = y / dd;
+		return  d < R1 && d > R2 && ((a > a1 && a <= a2) || (b > a1 && b <= a2));
 	});
 
 	targetBitmap.context.putImageData(imageData, 0, 0, 0, 0, srcBitmap.width, srcBitmap.height);
@@ -128,7 +133,7 @@ export class CirclePuzzle {
 
 		var r1 = Math.min(btm.width, btm.height) / 2 | 0;
 
-        sliceImage(btm, btm, r1, r1/2, 0, Math.PI / 20);
+        sliceImage(btm, btm, r1, r1/2, (Math.PI / 4)*3, (Math.PI / 4)*4);
 
 		game.add.image(0, 0, btm);
 
