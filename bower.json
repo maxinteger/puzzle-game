@@ -25,6 +25,7 @@
     "bin-packing": "jakesgordon/bin-packing",
     "lodash": "~3.10.0",
     "phaser": "~2.4",
-    "eventemitter2": "~0.4.14"
+    "eventemitter2": "~0.4.14",
+    "ramda": "~0.17.1"
   }
 }

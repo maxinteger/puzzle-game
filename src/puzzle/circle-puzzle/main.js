@@ -1,3 +1,4 @@
+import {map} from 'ramda';
 import {Button, Link, Checkbox, createLabel} from '../../gui';
 import {mapImageData, clampImage} from './basic';
 
@@ -77,29 +78,32 @@ var MoveManager = _.extend(Object.create(null), {
 	}
 });
 
-
-function sliceImage(srcBitmap, targetBitmap, r1, r2, radFrom, radTo){
-	function getLimit(rad){
-		var q = Math.PI / 4;
-		return ((rad > q && rad < q * 3) || (rad > q * 5 && rad < q * 7 ) ? Math.sin : Math.cos)(rad);
+function sliceImage(srcBitmap, targetBitmap, r1, r2, qFrom, qTimes){
+	function getMethod(q){
+		return (q >= 1 && q < 3) || (q >= 5 && q < 7 );
 	}
-	var ctx = srcBitmap.context,
+	var {sin, cos, PI} = Math,
+		q = PI / 4,
+		ctx = srcBitmap.context,
+		isSin = getMethod(qFrom),
 		imageData = ctx.getImageData(0, 0, srcBitmap.width, srcBitmap.height),
 		cx = srcBitmap.width / 2 | 0,
 		cy = srcBitmap.height / 2 | 0,
-		a2 = getLimit(radFrom),
-		a1 = getLimit(radTo),
+		a2 = (isSin ? sin : cos)(qFrom * q),
+		a1 = (isSin ? sin : cos)(qFrom * q + qTimes * q),
 		R1 = r1 * r1,
 		R2 = r2 * r2;
-
+		if (a1 > a2){
+			[a1, a2] = [a2, a1];
+		}
+	console.log(isSin);
 	clampImage(imageData, (x, y) => {
 		x -= cx;
 		y -= cy;
 		var d = x * x + y * y,
 			dd = Math.sqrt(d),
-			a = x / dd,
-			b = y / dd;
-		return  d < R1 && d > R2 && ((a > a1 && a <= a2) || (b > a1 && b <= a2));
+			a = isSin ? y / dd : x / dd;
+		return  d < R1 && d > R2 && (a >= a1 && a <= a2);
 	});
 
 	targetBitmap.context.putImageData(imageData, 0, 0, 0, 0, srcBitmap.width, srcBitmap.height);
@@ -125,17 +129,29 @@ export class CirclePuzzle {
 		var game = this.game,
 			itemsGroup = game.add.group(),
 			tileGroup = game.add.group(),
-			btm = game.make.bitmapData();
+			r1 = Math.min(512, 384) / 2 | 0;
+			game.stage.backgroundColor = '#A67F59';
 
-		btm.load('image');
+		map(d => {
+			var btm = game.make.bitmapData();
+			btm.load('image');
 
-		game.stage.backgroundColor = '#A67F59';
+			sliceImage(btm, btm, ...d);
 
-		var r1 = Math.min(btm.width, btm.height) / 2 | 0;
+			game.add.image(0, 0, btm);
+			return btm;
+		}, [
+			[r1, r1/2, 0, 1],
+			[r1, r1/2, 2, 1],
+			[r1, r1/2, 3, 1],
+			[r1, r1/2, 5, 1],
 
-        sliceImage(btm, btm, r1, r1/2, (Math.PI / 4)*3, (Math.PI / 4)*4);
+			[r1/2, r1/5, 0, 1],
+			[r1/2, r1/5, 2, 1],
+			[r1/2, r1/5, 3, 1],
+			[r1/2, r1/5, 5, 1]
+		]);
 
-		game.add.image(0, 0, btm);
 
 		var btnBack = new Link(game, 25, game.world.height - 75, 'Menu', 'menu');
 		btnBack.events.onInputDown.add(() => game.state.start('Menu'));
