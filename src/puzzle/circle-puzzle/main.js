@@ -96,7 +96,7 @@ function sliceImage(srcBitmap, targetBitmap, r1, r2, qFrom, qTimes){
 		if (a1 > a2){
 			[a1, a2] = [a2, a1];
 		}
-	console.log(isSin);
+
 	clampImage(imageData, (x, y) => {
 		x -= cx;
 		y -= cy;
@@ -127,6 +127,7 @@ export class CirclePuzzle {
 
 	create(){
 		var game = this.game,
+			group = game.add.group(),
 			itemsGroup = game.add.group(),
 			tileGroup = game.add.group(),
 			r1 = Math.min(512, 384) / 2 | 0;
@@ -138,7 +139,7 @@ export class CirclePuzzle {
 
 			sliceImage(btm, btm, ...d);
 
-			game.add.image(0, 0, btm);
+			group.add(new Phaser.Sprite(game, 0, 0, btm));
 			return btm;
 		}, [
 			[r1, r1/2, 0, 1],
@@ -152,6 +153,8 @@ export class CirclePuzzle {
 			[r1/2, r1/5, 5, 1]
 		]);
 
+		group.x = (game.world.width - group.width) / 2;
+		group.y = (game.world.height - group.height) / 2;
 
 		var btnBack = new Link(game, 25, game.world.height - 75, 'Menu', 'menu');
 		btnBack.events.onInputDown.add(() => game.state.start('Menu'));
